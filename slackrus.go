@@ -74,18 +74,16 @@ func (sh *SlackrusHook) Fire(e *logrus.Entry) error {
 		attach.Text = "Message fields"
 
 		for k, v := range e.Data {
-			slackField := &slack.Field{}
-
-			if str, ok := v.(string); ok {
-				slackField.Title = k
-				slackField.Value = str
-				// If the field is <= 20 then we'll set it to short
-				if len(str) <= 20 {
-					slackField.Short = true
+			str := toString(v)
+			if str != "" {
+				slackField := &slack.Field{
+					Title: k,
+					Value: str,
+					Short: len(str) <= 20,
 				}
-			}
-			attach.AddField(slackField)
 
+				attach.AddField(slackField)
+			}
 		}
 		attach.Pretext = e.Message
 	} else {
